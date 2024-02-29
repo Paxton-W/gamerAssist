@@ -12,7 +12,7 @@ let gameplayPersonTurns = 1;
 
 //timer
 let t_cur_timer;
-let t_set_timer = 3000;
+let t_set_timer = 30000;
 let t_start_timer;
 let t_timesup = false;
 let t_running = false;
@@ -89,22 +89,21 @@ function setup() {
 }
 
 function draw() {
-  background(100);
-  fill(255);
-  stroke(255);
+  background("#153243");
+  fill("#284B63");
+  // stroke(255);
   // gameplayPerson = 3;
   // gameplayPersonTurns = 1;
   // gameplay3pCornerMode = true;
   if (gameState == "welcome") {
     push();
-    background(160, 16, 15);
-    rect(w / 2, h / 2, vw * 0.8, vw * 0.8, 10);
-    fill(0);
+    rect(w / 2, h / 2, vw * 0.8, vh * 0.8, 10);
+    fill("#F4F9E9");
     textSize(vw * 0.1);
     text("Gamer Assist", w / 2, h * 0.4);
     textSize(vw * 0.04);
     text("By Paxton", w / 2, h * 0.48);
-    fill(160, 16, 15);
+    fill("#A50104");
     translate(w / 2, h * 0.6);
     rect(0, 0, vw * 0.4, vw * 0.1, 10);
     textSize(vw * 0.06);
@@ -113,9 +112,8 @@ function draw() {
     pop();
   } else if (gameState == "select") {
     push();
-    background(160, 16, 15);
-    rect(w / 2, h / 2, vw * 0.8, vw * 0.8, 10);
-    fill(0);
+    rect(w / 2, h / 2, vw * 0.8, vh * 0.8, 10);
+    fill(255);
     textSize(vw * 0.1);
     text("Select", w / 2, h * 0.3);
     pop();
@@ -216,13 +214,19 @@ function draw() {
     }
     var t_min = floor(t_cur_timer / 1000 / 60);
     var t_sec = ceil((t_cur_timer / 1000) % 60);
+    fill(255);
     //top timer
     push();
     textSize(vw * 0.25);
     translate(0, -18);
     translate(w / 2, h * 0.14);
     rotate(180);
-    text(`0${t_min}:${t_sec}`, 0, 0);
+    if (t_sec < 10) {
+      text(`0${t_min}:0${t_sec}`, 0, 0);
+    } else {
+      text(`0${t_min}:${t_sec}`, 0, 0);
+    }
+
     pop();
 
     //bottom timer
@@ -230,7 +234,11 @@ function draw() {
     textSize(vw * 0.25);
     translate(0, 18);
     translate(w / 2, h * 0.86);
-    text(`0${t_min}:${t_sec}`, 0, 0);
+    if (t_sec < 10) {
+      text(`0${t_min}:0${t_sec}`, 0, 0);
+    } else {
+      text(`0${t_min}:${t_sec}`, 0, 0);
+    }
     pop();
   }
 }
