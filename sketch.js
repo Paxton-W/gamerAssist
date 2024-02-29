@@ -218,7 +218,7 @@ function draw() {
     push();
     textSize(vw * 0.25);
     translate(0, -18);
-    translate(w / 2, h * 0.3);
+    translate(w / 2, h * 0.2);
     rotate(180);
     if (t_sec < 10) {
       text(`0${t_min}:0${t_sec}`, 0, 0);
@@ -232,7 +232,7 @@ function draw() {
     push();
     textSize(vw * 0.25);
     translate(0, 18);
-    translate(w / 2, h * 0.7);
+    translate(w / 2, h * 0.8);
     if (t_sec < 10) {
       text(`0${t_min}:0${t_sec}`, 0, 0);
     } else {
