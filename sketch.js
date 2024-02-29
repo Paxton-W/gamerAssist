@@ -156,7 +156,6 @@ function draw() {
   } else if (gameState == "play") {
     //arrow
     //2p 3p 4p
-
     if (gameplayPersonTurns > 0) {
       push();
       translate(w / 2, h / 2);
@@ -219,7 +218,7 @@ function draw() {
     push();
     textSize(vw * 0.25);
     translate(0, -18);
-    translate(w / 2, h * 0.14);
+    translate(w / 2, h * 0.3);
     rotate(180);
     if (t_sec < 10) {
       text(`0${t_min}:0${t_sec}`, 0, 0);
@@ -233,7 +232,7 @@ function draw() {
     push();
     textSize(vw * 0.25);
     translate(0, 18);
-    translate(w / 2, h * 0.86);
+    translate(w / 2, h * 0.7);
     if (t_sec < 10) {
       text(`0${t_min}:0${t_sec}`, 0, 0);
     } else {
