@@ -35,7 +35,7 @@ function windowResized() {
   vw = min(w, 600);
   vh = min(h, 1200);
 }
-function mouseClicked() {
+function mousePressed() {
   if (gameState == "welcome") {
     if (mouseX > w * 0.46 && mouseX < w * 0.54 && mouseY > h * 0.6 - vw * 0.1 && mouseY < h * 0.6 + vw * 0.1) {
       gameState = "select";
