@@ -37,7 +37,7 @@ function windowResized() {
 }
 function mousePressed() {
   if (gameState == "welcome") {
-    if (mouseX > w * 0.46 && mouseX < w * 0.54 && mouseY > h * 0.6 - vw * 0.1 && mouseY < h * 0.6 + vw * 0.1) {
+    if (mouseX > w * 0.46 && mouseX < w * 0.54) {
       gameState = "select";
     }
   } else if (gameState == "select") {
