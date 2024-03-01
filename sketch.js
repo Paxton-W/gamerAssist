@@ -3,6 +3,7 @@ let font1;
 let img_arrow;
 let w, h;
 let s_pop;
+let btns = [];
 let btn_start, btn_2p, btn_3p, btn_3pc, btn_4p; //for DOM
 
 let gameState = "wait";
@@ -18,6 +19,15 @@ let t_timesup = false;
 let t_running = false;
 let touch_next_trigger = false;
 
+let clr = {
+  white: "#EFEEF6",
+  blue: "#0C6C8F",
+  red: "#B4151E",
+  orange: "#BF3E0F",
+  darkBlue: "#153243",
+  greyDark: "#333",
+  greyLight: "#777",
+};
 let orientationA = "v";
 
 function windowResized() {
@@ -78,7 +88,25 @@ function setup() {
   cvs = createCanvas(10, 10);
   cvs.parent("p5cvs");
   windowResized();
-  console.log({ orientationA });
+  function createAButton(vari, lable, x, y) {
+    vari = createButton(lable);
+    // vari.position(x, y, "fixed");
+    vari.hide();
+    vari.trigger = false;
+    vari.mousePressed(() => {
+      vari.trigger = true;
+      console.log(vari);
+    });
+    vari.addClass("button");
+    btns.push(vari);
+    console.log(vari);
+  }
+  createAButton(btn_start, "Start", w / 2, h * 0.6);
+  createAButton(btn_2p, "2p", w / 2, h * 0.4);
+  createAButton(btn_3p, "3p", w / 2, h * 0.5);
+  createAButton(btn_3pc, "3pc", w / 2, h * 0.6);
+  createAButton(btn_4p, "4p", w / 2, h * 0.7);
+  // console.log({ orientationA });
   gameState = "welcome";
   textFont(font1);
   angleMode(DEGREES);
@@ -89,21 +117,23 @@ function setup() {
 }
 
 function draw() {
-  background("#153243");
-  fill("#284B63");
-  // stroke(255);
-  // gameplayPerson = 3;
-  // gameplayPersonTurns = 1;
-  // gameplay3pCornerMode = true;
+  btns.forEach((b) => {
+    if (b.trigger) {
+      console.log("1");
+      b.trigger = false;
+    }
+  });
+  background(clr.greyDark);
+  fill("#222");
   if (gameState == "welcome") {
     push();
     rect(w / 2, h / 2, vw * 0.8, vh * 0.8, 10);
-    fill("#F4F9E9");
+    fill(clr.white);
     textSize(vw * 0.1);
     text("Gamer Assist", w / 2, h * 0.4);
     textSize(vw * 0.04);
-    text("By Paxton", w / 2, h * 0.48);
-    fill("#A50104");
+    text("Timer", w / 2, h * 0.48);
+    fill(clr.red);
     translate(w / 2, h * 0.6);
     rect(0, 0, vw * 0.4, vw * 0.1, 10);
     textSize(vw * 0.06);
@@ -225,7 +255,6 @@ function draw() {
     } else {
       text(`0${t_min}:${t_sec}`, 0, 0);
     }
-
     pop();
 
     //bottom timer
