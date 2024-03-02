@@ -18,6 +18,7 @@ let t_start_timer;
 let t_timesup = false;
 let t_running = false;
 let touch_next_trigger = false;
+let lastChangeTouch = 0;
 
 let clr = {
   white: "#EFEEF6",
@@ -73,9 +74,12 @@ function mousePressed() {
     t_cur_timer = t_set_timer;
     console.log({ gameplayPerson, gameplayPersonTurns, gameplay3pCornerMode });
   } else if (gameState == "play") {
-    touch_next_trigger = true;
-    s_pop.play();
-    console.log(t_cur_timer);
+    if (millis() - lastChangeTouch > 500) {
+      touch_next_trigger = true;
+      s_pop.play();
+      console.log(t_cur_timer);
+      lastChangeTouch = millis();
+    }
   }
 }
 function preload() {
