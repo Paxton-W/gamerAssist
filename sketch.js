@@ -41,10 +41,15 @@ function windowResized() {
   } else {
     orientationA = "h";
   }
+  btns.forEach((b) => {
+    b.position(b.pos.x * ww, b.pos.y * hh, "fixed");
+  });
   w = width;
   h = height;
   vw = min(w, 600);
   vh = min(h, 1200);
+  ww = windowWidth;
+  hh = windowHeight;
 }
 function mousePressed() {
   if (gameState == "welcome") {
@@ -92,11 +97,12 @@ function setup() {
   cvs = createCanvas(10, 10);
   cvs.parent("p5cvs");
   windowResized();
-  function createAButton(vari, lable, x, y) {
+  function createAButton(vari, lable, xS, yS) {
     vari = createButton(lable);
-    // vari.position(x, y, "fixed");
-    vari.hide();
+    vari.position(xS * ww, yS * hh, "fixed");
+    // vari.hide();
     vari.trigger = false;
+    vari.pos = { x: xS, y: yS };
     vari.mousePressed(() => {
       vari.trigger = true;
       console.log(vari);
@@ -105,11 +111,11 @@ function setup() {
     btns.push(vari);
     console.log(vari);
   }
-  createAButton(btn_start, "Start", w / 2, h * 0.6);
-  createAButton(btn_2p, "2p", w / 2, h * 0.4);
-  createAButton(btn_3p, "3p", w / 2, h * 0.5);
-  createAButton(btn_3pc, "3pc", w / 2, h * 0.6);
-  createAButton(btn_4p, "4p", w / 2, h * 0.7);
+  createAButton(btn_start, "Start", 0.5, 0.6);
+  createAButton(btn_2p, "2p", 0.5, 0.4);
+  createAButton(btn_3p, "3p", 0.5, 0.5);
+  createAButton(btn_3pc, "3pc", 0.5, 0.6);
+  createAButton(btn_4p, "4p", 0.5, 0.7);
   // console.log({ orientationA });
   gameState = "welcome";
   textFont(font1);

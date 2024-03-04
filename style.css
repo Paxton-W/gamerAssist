@@ -20,7 +20,7 @@ canvas {
   border-radius: 30px;
   color: #fff;
   letter-spacing: 4px;
-  transition: all 0.5s ease-in-out;
+  /* transition: all 0.5s ease-in-out; */
 }
 
 /* .type1::after {
