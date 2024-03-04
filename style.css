@@ -10,12 +10,10 @@ canvas {
 }
 
 .button {
-  height: 5%;
-  width: 20%;
   position: relative;
   background-color: transparent;
   cursor: pointer;
-  border: 2px solid #fff;
+  border: 3px solid #fff;
   overflow: hidden;
   border-radius: 30px;
   color: #fff;
