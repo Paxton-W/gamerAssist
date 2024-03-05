@@ -134,7 +134,9 @@ function mousePressed() {
     t_cur_timer = t_set_timer;
     console.log({ gameplayPerson, gameplayPersonTurns, gameplay3pCornerMode });
   } else if (gameState == "play") {
-    if (millis() - lastChangeTouch > 500) {
+    if (mouseX > vw * 0 && mouseX < vw * 0.15 && mouseY > h * 0 && mouseY < vw * 0.15) {
+      gameState = "pause";
+    } else if (millis() - lastChangeTouch > 500) {
       touch_next_trigger = true;
       s_pop.play();
       console.log(t_cur_timer);
@@ -223,6 +225,11 @@ function draw() {
   } else if (gameState == "play") {
     //arrow
     //2p 3p 4p
+    push();
+    fill(255, 0, 0);
+    translate(0, 0);
+    rect(0, 0, vw * 0.3, vw * 0.3);
+    pop();
     if (gameplayPersonTurns > 0) {
       push();
       translate(w / 2, h / 2);
