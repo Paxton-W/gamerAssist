@@ -18,9 +18,13 @@ canvas {
   border-radius: 30px;
   color: #fff;
   letter-spacing: 4px;
-  /* transition: all 0.5s ease-in-out; */
+  transition: 0.5s ease-in-out;
 }
-
+.button:hover {
+  color: #fff;
+  background-color: #888;
+  border: none;
+}
 /* .type1::after {
   content: "";
   position: absolute;
@@ -35,11 +39,7 @@ canvas {
   z-index: -1;
 }
 
-.button:hover {
-  box-shadow: 1px 1px 200px #252525;
-  color: #fff;
-  border: none;
-}
+
 
 .type1:hover::after {
   visibility: visible;
