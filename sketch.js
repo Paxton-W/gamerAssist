@@ -204,7 +204,7 @@ function draw() {
     rect(w / 2, h / 2, vw * 0.8, vh * 0.8, 10);
     fill(clr.white);
     textSize(vw * 0.1);
-    text("Gamer Assist", w / 2, h * 0.4);
+    text("PlayPal", w / 2, h * 0.4);
     textSize(vw * 0.04);
     text("Please rotate to Portait Mode.", w / 2, h * 0.48);
     pop();

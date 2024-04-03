@@ -18,7 +18,6 @@ canvas {
   border-radius: 30px;
   color: #fff;
   letter-spacing: 4px;
-  transition: 0.5s ease-in-out;
 }
 .button:hover {
   color: #fff;
