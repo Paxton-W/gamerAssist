@@ -12,10 +12,6 @@ let s_pop;
 let btns = {};
 
 let gameState = "wait";
-let timer_p = 2;
-let timer_t = 0;
-let gameplay3pCornerMode = false;
-let timer_pTurns = 1;
 
 //timer
 let t_cur_timer;
@@ -26,6 +22,10 @@ let t_running = false;
 let touch_next_trigger = false;
 let lastChangeTouch = 0;
 let [playerWin_p1, playerWin_p2, playerWin_p3, playerWin_p4] = [false, false, false, false];
+let timer_p = 2;
+let timer_t = 0;
+let gameplay3pCornerMode = false;
+let timer_pTurns = 1;
 
 let clr = {
   white: "#EFEEF6",
