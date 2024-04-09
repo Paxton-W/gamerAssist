@@ -5,11 +5,12 @@
 //by paxton
 
 let cvs;
-let font1;
+let font1, font2;
 let img_arrow;
 let w, h;
-let s_pop;
+let s_pop, s_fail, s_beep;
 let btns = {};
+let countDownSound = [false, false, false, false, false];
 
 let gameState = "wait";
 
@@ -21,7 +22,7 @@ let t_timesup = false;
 let t_running = false;
 let touch_next_trigger = false;
 let lastChangeTouch = 0;
-let [playerWin_p1, playerWin_p2, playerWin_p3, playerWin_p4] = [false, false, false, false];
+let playerWin = { p1: false, p2: false, p3: false, p4: false };
 let timer_p = 2;
 let timer_t = 0;
 let gameplay3pCornerMode = false;
@@ -72,9 +73,11 @@ function windowResized() {
 
 function preload() {
   font1 = loadFont("assets/CourierPrime-Bold.ttf");
+  font2 = loadFont("assets/TiltWarp-Regular-VariableFont_XROT,YROT.ttf");
   img_arrow = loadImage("assets/ar.png");
   s_pop = loadSound("assets/pop.mp3");
   s_fail = loadSound("assets/fail.wav");
+  s_beep = loadSound("assets/beep.wav");
 }
 function setup() {
   cvs = createCanvas(10, 10);
@@ -134,13 +137,14 @@ function setup() {
   //pause menu
   createAButton("pause", "-", 0.1, 0.1, 1);
   createAButton("resume", "Resume", 0.5, 0.3, 1.3);
-  createAButton("endGame", "End Game", 0.5, 0.4, 1.3);
+  createAButton("restart", "Restart", 0.5, 0.35, 1.3);
+  createAButton("endGame", "Exit", 0.5, 0.4, 1.3);
   //
   console.log(btns);
   // console.log({ orientationA });
   gameState = "welcome";
   btns.btn_start.show();
-  textFont(font1);
+  textFont(font2);
   angleMode(DEGREES);
   imageMode(CENTER);
   rectMode(CENTER);
@@ -148,33 +152,6 @@ function setup() {
   noStroke();
 }
 function mousePressed() {
-  // if (gameState == "welcome") {
-  //   if (mouseX > w * 0.46 && mouseX < w * 0.54) {
-  //     gameState = "timer_select";
-  //   }
-  // } else if (gameState == "timer_select") {
-  //   if (mouseX > w * 0.46 && mouseX < w * 0.54 && mouseY > h * 0.4 - vw * 0.05 && mouseY < h * 0.4 + vw * 0.05) {
-  //     //2p
-  //     timer_p = 2;
-  //     gameplay3pCornerMode = false;
-  //   } else if (mouseX > w * 0.46 && mouseX < w * 0.54 && mouseY > h * 0.5 - vw * 0.05 && mouseY < h * 0.5 + vw * 0.05) {
-  //     //3p
-  //     timer_p = 3;
-  //     gameplay3pCornerMode = false;
-  //   } else if (mouseX > w * 0.46 && mouseX < w * 0.54 && mouseY > h * 0.6 - vw * 0.05 && mouseY < h * 0.6 + vw * 0.05) {
-  //     //3pc
-  //     timer_p = 3;
-  //     gameplay3pCornerMode = true;
-  //   } else if (mouseX > w * 0.46 && mouseX < w * 0.54 && mouseY > h * 0.7 - vw * 0.05 && mouseY < h * 0.7 + vw * 0.05) {
-  //     //4p
-  //     timer_p = 4;
-  //     gameplay3pCornerMode = false;
-  //   }
-  //   timer_pTurns = 0;
-  //   gameState = "play";
-  //   t_cur_timer = t_set_timer;
-  //   console.log({ timer_p, timer_pTurns, gameplay3pCornerMode });
-  // } else
   if (gameState == "timer_play") {
     if (mouseX < 0.2 * vw && mouseY < 0.2 * vw) {
     } else if (millis() - lastChangeTouch > 500) {
@@ -182,17 +159,12 @@ function mousePressed() {
       s_pop.play();
       console.log(t_cur_timer);
       lastChangeTouch = millis();
+      countDownSound = [false, false, false, false, false];
     }
   }
 }
 function draw() {
   btnPress();
-  // Object.values(btns).forEach((b) => {
-  //   if (b.trigger) {
-  //     console.log("1");
-  //     b.trigger = false;
-  //   }
-  // });
   background(clr.greyDark);
   //rect inner background
   fill("#222");
@@ -211,172 +183,208 @@ function draw() {
     return;
   }
   //
-  if (gameState == "welcome") {
-    push();
-    fill(clr.white);
-    textSize(vw * 0.1);
-    text("PlayPal", w / 2, h * 0.4);
-    textSize(vw * 0.04);
-    text("Board Game Widget", w / 2, h * 0.48);
-    pop();
-  } else if (gameState == "func_select") {
-    push();
-    fill(clr.white);
-    textSize(vw * 0.1);
-    text("Select Tool", w / 2, h * 0.2);
-    textSize(vw * 0.04);
-    pop();
-  } else if (gameState == "timer_select") {
-    push();
-    rect(w / 2, h / 2, vw * 0.8, vh * 0.8, 10);
-    fill(255);
-    textSize(vw * 0.05);
-    text("Select\nNumber of Players", w / 2, h * 0.3);
-    pop();
-  } else if (gameState == "timer_time") {
-    push();
-    rect(w / 2, h / 2, vw * 0.8, vh * 0.8, 10);
-    fill(255);
-    textSize(vw * 0.05);
-    text("Select Duration", w / 2, h * 0.3);
-    pop();
-  } else if (gameState == "timer_play") {
-    if (timer_pTurns > 0) {
+  switch (gameState) {
+    case "welcome":
       push();
-      translate(w / 2, h / 2);
-      if (timer_p == 2 && timer_pTurns == 1) {
-        rotate(90);
-      } else if (timer_p == 2 && timer_pTurns == 2) {
-        rotate(-90);
-      } else if (timer_p == 3 && timer_pTurns == 1 && gameplay3pCornerMode) {
-        rotate(-90);
-      } else if (timer_p == 3 && timer_pTurns == 2 && gameplay3pCornerMode) {
-        rotate(0);
-      } else if (timer_p == 3 && timer_pTurns == 3 && gameplay3pCornerMode) {
-        rotate(90);
-      } else if (timer_p == 3 && timer_pTurns == 1 && !gameplay3pCornerMode) {
-        rotate(-90);
-      } else if (timer_p == 3 && timer_pTurns == 2 && !gameplay3pCornerMode) {
-        rotate(30);
-      } else if (timer_p == 3 && timer_pTurns == 3 && !gameplay3pCornerMode) {
-        rotate(150);
-      } else if (timer_p == 4 && timer_pTurns == 1) {
-        rotate(-90);
-      } else if (timer_p == 4 && timer_pTurns == 2) {
-        rotate(0);
-      } else if (timer_p == 4 && timer_pTurns == 3) {
-        rotate(90);
-      } else if (timer_p == 4 && timer_pTurns == 4) {
-        rotate(180);
-      }
-      scale(vw * 0.0015);
-      image(img_arrow, 0, 0);
+      fill(clr.white);
+      textSize(vw * 0.1);
+      text("PlayPal", w / 2, h * 0.4);
+      textSize(vw * 0.04);
+      text("Board Game Widget", w / 2, h * 0.48);
+      textSize(vw * 0.03);
+      text("ver 1.1.1 ", w * 0.93, h * 0.97);
       pop();
-      // console.log({ timer_p, timer_pTurns, gameplay3pCornerMode });
-    }
+      break;
+    case "func_select":
+      push();
+      fill(clr.white);
+      textSize(vw * 0.1);
+      text("Select Tool", w / 2, h * 0.2);
+      textSize(vw * 0.04);
+      pop();
+      break;
+    case "timer_select":
+      push();
+      rect(w / 2, h / 2, vw * 0.8, vh * 0.8, 10);
+      fill(255);
+      textSize(vw * 0.05);
+      text("Select\nNumber of Players", w / 2, h * 0.3);
+      pop();
+      break;
+    case "timer_time":
+      push();
+      rect(w / 2, h / 2, vw * 0.8, vh * 0.8, 10);
+      fill(255);
+      textSize(vw * 0.05);
+      text("Select Duration", w / 2, h * 0.3);
+      pop();
+      break;
+    case "timer_play":
+      if (timer_pTurns > 0) {
+        push();
+        translate(w / 2, h / 2);
+        if (timer_p === 2) {
+          if (timer_pTurns === 1) {
+            rotate(90);
+          } else if (timer_pTurns === 2) {
+            rotate(-90);
+          }
+        } else if (timer_p === 3) {
+          if (gameplay3pCornerMode) {
+            if (timer_pTurns === 1) {
+              rotate(-90);
+            } else if (timer_pTurns === 2) {
+              rotate(0);
+            } else if (timer_pTurns === 3) {
+              rotate(90);
+            }
+          } else {
+            if (timer_pTurns === 1) {
+              rotate(-90);
+            } else if (timer_pTurns === 2) {
+              rotate(30);
+            } else if (timer_pTurns === 3) {
+              rotate(150);
+            }
+          }
+        } else if (timer_p === 4) {
+          if (timer_pTurns === 1) {
+            rotate(-90);
+          } else if (timer_pTurns === 2) {
+            rotate(0);
+          } else if (timer_pTurns === 3) {
+            rotate(90);
+          } else if (timer_pTurns === 4) {
+            rotate(180);
+          }
+        }
 
-    //player's turn
-    if (touch_next_trigger) {
-      if (timer_p == 2) {
-        if (timer_pTurns == 1) {
-          timer_pTurns++;
-        } else {
-          timer_pTurns = 1;
-        }
-      } else if (timer_p == 3) {
-        if (playerWin_p1 && timer_pTurns == 3) {
-          timer_pTurns = 1;
-        } else if (playerWin_p2 && timer_pTurns == 1) {
-          timer_pTurns = 2;
-        } else if (playerWin_p3 && timer_pTurns == 2) {
-          timer_pTurns = 3;
-        }
-        if (timer_pTurns < 3) {
-          timer_pTurns++;
-        } else {
-          timer_pTurns = 1;
-        }
-      } else if (timer_p == 4) {
-        if (playerWin_p1 && timer_pTurns == 3) {
-          timer_pTurns = 1;
-        } else if (playerWin_p2 && timer_pTurns == 1) {
-          timer_pTurns = 2;
-        } else if (playerWin_p3 && timer_pTurns == 2) {
-          timer_pTurns = 3;
-        } else if (playerWin_p4 && timer_pTurns == 3) {
-          timer_pTurns = 4;
-        }
-        if (playerWin_p1 && timer_pTurns == 3) {
-          timer_pTurns = 1;
-        } else if (playerWin_p2 && timer_pTurns == 1) {
-          timer_pTurns = 2;
-        } else if (playerWin_p3 && timer_pTurns == 2) {
-          timer_pTurns = 3;
-        } else if (playerWin_p4 && timer_pTurns == 3) {
-          timer_pTurns = 4;
-        }
-        if (timer_pTurns < 4) {
-          timer_pTurns++;
-        } else {
-          timer_pTurns = 1;
-        }
+        scale(vw * 0.0015);
+        image(img_arrow, 0, 0);
+        pop();
+        // console.log({ timer_p, timer_pTurns, gameplay3pCornerMode });
       }
 
-      touch_next_trigger = false;
-      t_running = true;
-      t_cur_timer = t_set_timer;
-      t_start_timer = millis();
-      console.log({ timer_pTurns });
-    }
-    //timer run
-    if (t_running && t_cur_timer > 20) {
-      t_cur_timer = t_set_timer - (millis() - t_start_timer);
-    } else if (t_running) {
-      t_cur_timer = 0;
-      t_running = false;
-      s_fail.play();
-    }
-    var t_min = floor(t_cur_timer / 1000 / 60);
-    var t_sec = ceil((t_cur_timer / 1000) % 60);
-    fill(255);
-    //top timer
-    push();
-    textSize(vw * 0.25);
-    translate(0, -18);
-    translate(w / 2, h * 0.2);
-    rotate(180);
-    if (t_sec < 10) {
-      text(`0${t_min}:0${t_sec}`, 0, 0);
-    } else {
-      text(`0${t_min}:${t_sec}`, 0, 0);
-    }
-    textSize(vw * 0.05);
-    text("Player " + timer_pTurns, 0, h * -0.05);
-    pop();
+      //player's turn
+      if (touch_next_trigger) {
+        if (timer_p == 2) {
+          if (timer_pTurns == 1) {
+            timer_pTurns++;
+          } else {
+            timer_pTurns = 1;
+          }
+        } else if (timer_p == 3) {
+          if (playerWin.p1 && timer_pTurns == 3) {
+            timer_pTurns = 1;
+          } else if (playerWin.p2 && timer_pTurns == 1) {
+            timer_pTurns = 2;
+          } else if (playerWin.p3 && timer_pTurns == 2) {
+            timer_pTurns = 3;
+          }
+          if (timer_pTurns < 3) {
+            timer_pTurns++;
+          } else {
+            timer_pTurns = 1;
+          }
+        } else if (timer_p == 4) {
+          if (playerWin.p1 && timer_pTurns == 3) {
+            timer_pTurns = 1;
+          } else if (playerWin.p2 && timer_pTurns == 1) {
+            timer_pTurns = 2;
+          } else if (playerWin.p3 && timer_pTurns == 2) {
+            timer_pTurns = 3;
+          } else if (playerWin.p4 && timer_pTurns == 3) {
+            timer_pTurns = 4;
+          }
+          if (playerWin.p1 && timer_pTurns == 3) {
+            timer_pTurns = 1;
+          } else if (playerWin.p2 && timer_pTurns == 1) {
+            timer_pTurns = 2;
+          } else if (playerWin.p3 && timer_pTurns == 2) {
+            timer_pTurns = 3;
+          } else if (playerWin.p4 && timer_pTurns == 3) {
+            timer_pTurns = 4;
+          }
+          if (timer_pTurns < 4) {
+            timer_pTurns++;
+          } else {
+            timer_pTurns = 1;
+          }
+        }
 
-    //bottom timer
-    push();
-    textSize(vw * 0.25);
-    translate(0, 18);
-    translate(w / 2, h * 0.8);
-    if (t_sec < 10) {
-      text(`0${t_min}:0${t_sec}`, 0, 0);
-    } else {
-      text(`0${t_min}:${t_sec}`, 0, 0);
-    }
-    textSize(vw * 0.05);
-    text("Player " + timer_pTurns, 0, h * -0.05);
-    pop();
-  } else if (gameState == "timer_pause") {
-    push();
-    fill(clr.white);
-    textSize(vw * 0.1);
-    text("Pause", w / 2, h * 0.17);
-    textSize(vw * 0.05);
-    text("Finished?", w / 2, h * 0.5);
-    pop();
+        touch_next_trigger = false;
+        t_running = true;
+        t_cur_timer = t_set_timer;
+        t_start_timer = millis();
+        console.log({ timer_pTurns });
+      }
+      //timer run
+      if (t_running && t_cur_timer > 20) {
+        t_cur_timer = t_set_timer - (millis() - t_start_timer);
+      } else if (t_running) {
+        t_cur_timer = 0;
+        t_running = false;
+        s_fail.play();
+      }
+      var t_min = floor(t_cur_timer / 1000 / 60);
+      var t_sec = ceil((t_cur_timer / 1000) % 60);
+      if (t_cur_timer < 5000 && !countDownSound[4]) {
+        s_beep.play();
+        countDownSound[4] = true;
+      } else if (t_cur_timer < 4000 && !countDownSound[3]) {
+        s_beep.play();
+        countDownSound[3] = true;
+      } else if (t_cur_timer < 3000 && !countDownSound[2]) {
+        s_beep.play();
+        countDownSound[2] = true;
+      } else if (t_cur_timer < 2000 && !countDownSound[1]) {
+        s_beep.play();
+        countDownSound[1] = true;
+      } else if (t_cur_timer < 1000 && !countDownSound[0]) {
+        s_beep.play();
+        countDownSound[0] = true;
+      }
+      fill(255);
+      //top timer
+      push();
+      textSize(vw * 0.25);
+      translate(0, -18);
+      translate(w / 2, h * 0.2);
+      rotate(180);
+      if (t_sec < 10) {
+        text(`0${t_min}:0${t_sec}`, 0, 0);
+      } else {
+        text(`0${t_min}:${t_sec}`, 0, 0);
+      }
+      textSize(vw * 0.05);
+      text("Player " + timer_pTurns, 0, h * -0.05);
+      pop();
+
+      //bottom timer
+      push();
+      textSize(vw * 0.25);
+      translate(0, 18);
+      translate(w / 2, h * 0.8);
+      if (t_sec < 10) {
+        text(`0${t_min}:0${t_sec}`, 0, 0);
+      } else {
+        text(`0${t_min}:${t_sec}`, 0, 0);
+      }
+      textSize(vw * 0.05);
+      text("Player " + timer_pTurns, 0, h * -0.05);
+      pop();
+      break;
+    case "timer_pause":
+      push();
+      fill(clr.white);
+      textSize(vw * 0.1);
+      text("Pause", w / 2, h * 0.17);
+      textSize(vw * 0.05);
+      text("Finished?", w / 2, h * 0.5);
+      pop();
+      break;
   }
-  debugInfo();
+  // debugInfo();
 }
 
 function btnPress() {
@@ -482,9 +490,10 @@ function btnPress() {
       gameState = "timer_pause";
       btns.resume.show();
       btns.endGame.show();
+      btns.restart.show();
       if (timer_p == 3) {
         //win
-        if (!playerWin_p1 && !playerWin_p2 && !playerWin_p3) {
+        if (!playerWin.p1 && !playerWin.p2 && !playerWin.p3) {
           btns.win1.show();
           btns.win2.show();
           btns.win3.show();
@@ -498,14 +507,14 @@ function btnPress() {
         btns.win4.show();
 
         let winCount = 0;
-        playerWin_p1 && winCount++;
-        playerWin_p2 && winCount++;
-        playerWin_p3 && winCount++;
-        playerWin_p4 && winCount++;
-        playerWin_p1 && btns.win1.hide();
-        playerWin_p2 && btns.win2.hide();
-        playerWin_p3 && btns.win3.hide();
-        playerWin_p4 && btns.win4.hide();
+        playerWin.p1 && winCount++;
+        playerWin.p2 && winCount++;
+        playerWin.p3 && winCount++;
+        playerWin.p4 && winCount++;
+        playerWin.p1 && btns.win1.hide();
+        playerWin.p2 && btns.win2.hide();
+        playerWin.p3 && btns.win3.hide();
+        playerWin.p4 && btns.win4.hide();
         if (winCount > 1) {
           btns.win1.hide();
           btns.win2.hide();
@@ -522,6 +531,7 @@ function btnPress() {
       //
       btns.resume.hide();
       btns.endGame.hide();
+      btns.restart.hide();
       //win
       btns.win1.hide();
       btns.win2.hide();
@@ -537,21 +547,27 @@ function btnPress() {
 
       btns.endGame.click = false;
     } else if (btns.win1.click) {
-      playerWin_p1 = true;
+      playerWin.p1 = true;
       gameSetup_timer_pause();
       btns.win1.click = false;
     } else if (btns.win2.click) {
-      playerWin_p2 = true;
+      playerWin.p2 = true;
       gameSetup_timer_pause();
       btns.win2.click = false;
     } else if (btns.win3.click) {
-      playerWin_p3 = true;
+      playerWin.p3 = true;
       gameSetup_timer_pause();
       btns.win3.click = false;
     } else if (btns.win4.click) {
-      playerWin_p4 = true;
+      playerWin.p4 = true;
       gameSetup_timer_pause();
       btns.win4.click = false;
+    } else if (btns.restart.click) {
+      gameSetup_timer_pause();
+      playerWin = { p1: false, p2: false, p3: false, p4: false };
+      t_cur_timer = t_set_timer;
+      timer_pTurns = 1;
+      btns.restart.click = false;
     }
   }
 }
@@ -566,7 +582,7 @@ function gameReset() {
   t_timesup = false;
   touch_next_trigger = false;
   lastChangeTouch = 0;
-  [playerWin_p1, playerWin_p2, playerWin_p3, playerWin_p4] = [false, false, false, false];
+  [playerWin.p1, playerWin.p2, playerWin.p3, playerWin.p4] = [false, false, false, false];
 }
 function debugInfo() {
   push();
